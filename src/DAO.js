@@ -17,5 +17,12 @@ module.exports = function(connection_string) {
     meetups.insertOne(meetup);
   }
 
+  this.getMeetups = async function() {
+    const records = await meetups.find().toArray();
+    const filtered = records.filter(el => el.date > new Date());
+    filtered.sort((a,b) => a.date - b.date);
+    return filtered;
+  }
+
   return this;
 }

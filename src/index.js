@@ -36,7 +36,7 @@ async function createMeetup(msg) {
     return;
   }
 
-  const dateFormat = new RegExp(/..\...\..... ..:../);
+  const dateFormat = new RegExp(/..\...\..... ..:../); //30.06.2022 19:32
   const args = msg.text.split('"');
   const title = args[1];
   const dateString = args[3];
@@ -53,7 +53,7 @@ async function createMeetup(msg) {
   date.setMinutes(dateparts[4]);
 
   db.createMeetup({
-    speaker: msg.from.username,
+    speaker: '@'+msg.from.username,
     date,
     title
   });
@@ -65,6 +65,21 @@ async function createMeetup(msg) {
  * @param {TelegramBot.Message} msg 
  */
 async function meetups(msg) {
-  bot.sendMessage(msg.chat.id, `Hello, ${msg.from.first_name}!`);
+  const meetups = await db.getMeetups();
+  if(!meetups?.length) {
+    bot.sendMessage(msg.chat.id, 'В планах пока ничего нет');
+    return;
+  }
+  bot.sendMessage(msg.chat.id, 'Расписание встреч:', {
+    reply_markup: {
+      inline_keyboard: 
+        meetups.map(el => {
+          return [{
+            text: `${el.title} | ${el.date.toLocaleString('ru').slice(0,-3)}`,
+            url: 'https://github.com/DEsimas'
+          }]
+        })
+    }
+  })
 }
 
