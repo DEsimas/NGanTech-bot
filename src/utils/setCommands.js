@@ -4,7 +4,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const commands = [
   {
     command: 'createmeetup',
-    description: 'Позволяет выступающим запланировать встречу'
+    description: 'Позволяет выступающим запланировать встречу. /createmeetup "Встреча хацкеров" "30.06.2022 19:32"'
   },
   {
     command: 'meetups',
@@ -12,7 +12,7 @@ const commands = [
   }
 ];
 
-const bot = new TelegramBot(process.env.BOT_TOKEN, {polling: true});
+const bot = new TelegramBot(prsrocess.env.BOT_TOKEN, {polling: true});
 
 bot.setMyCommands(commands)
   .then(() => {
