@@ -12,7 +12,7 @@ const commands = [
   }
 ];
 
-const bot = new TelegramBot(process.env.TOKEN, {polling: true});
+const bot = new TelegramBot(process.env.BOT_TOKEN, {polling: true});
 
 bot.setMyCommands(commands)
   .then(() => {
