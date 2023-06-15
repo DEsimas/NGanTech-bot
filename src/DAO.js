@@ -24,5 +24,10 @@ module.exports = function(connection_string) {
     return filtered;
   }
 
+  this.deleteMeetup = async function(speakerId, meetupName) {
+    const res = await meetups.deleteMany({speakerId, title: meetupName});
+    return res.deletedCount > 0;
+  }
+
   return this;
 }

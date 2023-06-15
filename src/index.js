@@ -16,6 +16,9 @@ bot.on('message', msg => {
     case '/meetups':
       handler = meetups;
       break;
+    case '/deletemeetup':
+      handler = deleteMeetup;
+      break;
   }
   if(handler) {
     handler(msg)
@@ -53,7 +56,7 @@ async function createMeetup(msg) {
   date.setMinutes(dateparts[4]);
 
   db.createMeetup({
-    speaker: '@'+msg.from.username,
+    speakerId: msg.from.id,
     date,
     title
   });
@@ -83,3 +86,25 @@ async function meetups(msg) {
   })
 }
 
+/**
+ * @param {TelegramBot.Message} msg 
+ */
+async function deleteMeetup(msg) {
+  const userRoles = await db.getUserRoles(msg.from.id);
+  if(!userRoles.includes('speaker')) {
+    bot.sendMessage(msg.chat.id, 'У вас недостаточно прав для использования этой команды!');
+    return;
+  }
+
+  const name = msg.text.split('"')[1];
+  if(!name) {
+    bot.sendMessage(msg.chat.id, 'Команда была неверно использована!');
+    return;
+  }
+
+  if(await db.deleteMeetup(msg.from.id, name)) {
+    bot.sendMessage(msg.chat.id, 'Успешно');
+  } else {
+    bot.sendMessage(msg.chat.id, 'Вы не планировали встречи с таким названием');
+  }
+}
