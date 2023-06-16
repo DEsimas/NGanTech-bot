@@ -40,5 +40,9 @@ module.exports = function(connection_string) {
     await sales.insertOne(sale);
   }
 
+  this.getSales = async function(userId) {
+    return (await sales.find({userId}).toArray()).sort((a,b) => b.date - a.date);
+  }
+
   return this;
 }

@@ -17,6 +17,10 @@ const commands = [
   {
     command: 'confirmsale',
     description: 'Заявить о сделанной продаже'
+  },
+  {
+    command: 'stats',
+    description: 'Посмотреть свою статистику по продажам'
   }
 ];
 

@@ -51,11 +51,11 @@ async function confirmSale(msg) {
 async function getMoney(msg) {
   const user = state.get(msg.from.id);
   const amount = Number(msg.text);
+  user.isWaitingMoney = false;
   if(isNaN(amount)) {
     await bot.sendMessage(msg.from.id, 'Неверное число, попробуйте ещё раз');
     return;
   }
-  user.isWaitingMoney = true;
   const sale = {userId: msg.from.id, userName: `${msg.from.first_name} ${msg.from.last_name || ''}`.trim(), price: amount, id: v4()};
   sales.push(sale);
   await verify(sale);
