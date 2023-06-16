@@ -4,7 +4,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const commands = [
   {
     command: 'createmeetup',
-    description: '/createmeetup "Встреча хацкеров" "30.06.2022 19:32"'
+    description: 'Запланировать встречу'
   },
   {
     command: 'deletemeetup',
