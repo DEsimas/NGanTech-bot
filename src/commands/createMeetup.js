@@ -1,3 +1,5 @@
+const newMeetup = require('../notifications/newMeetup');
+
 const {bot, db} = process;
 const state = new Map();
 
@@ -132,4 +134,9 @@ async function scheduleMeetup(userId) {
     date: date
   });
   state.set(userId, {});
+  await newMeetup({
+    speakerId: userId,
+    title: user.meetup.title,
+    date: date
+  });
 }

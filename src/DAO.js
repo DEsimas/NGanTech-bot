@@ -62,5 +62,9 @@ module.exports = function(connection_string) {
     return Object.keys(res).map(key => ({user: key, ...res[key]})).sort((a,b) => b.sum - a.sum);
   }
 
+  this.getUsers = async function() {
+    return await users.find().toArray();
+  }
+
   return this;
 }
