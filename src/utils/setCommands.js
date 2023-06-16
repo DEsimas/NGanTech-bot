@@ -21,6 +21,10 @@ const commands = [
   {
     command: 'stats',
     description: 'Посмотреть свою статистику по продажам'
+  },
+  {
+    command: 'top',
+    description: 'Посмотреть топ продажников'
   }
 ];
 

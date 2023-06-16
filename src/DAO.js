@@ -44,5 +44,23 @@ module.exports = function(connection_string) {
     return (await sales.find({userId}).toArray()).sort((a,b) => b.date - a.date);
   }
 
+  this.getTop = async function() {
+    const list = await sales.find({}).toArray();
+    const res = {};
+    list.forEach(el => {
+      const key = el.userId;
+      if(res[key]) {
+        res[key].amount++;
+        res[key].sum += el.price;
+      } else {
+        res[key] = {
+          amount: 1,
+          sum: el.price
+        }
+      }
+    });
+    return Object.keys(res).map(key => ({user: key, ...res[key]}));
+  }
+
   return this;
 }
