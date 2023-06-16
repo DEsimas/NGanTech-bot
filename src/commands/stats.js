@@ -1,3 +1,5 @@
+const declOfNum = require('../utils/declOfNum');
+
 const {bot, db} = process;
 
 bot.on('message', async (msg) => {
@@ -17,7 +19,7 @@ async function stats(msg) {
     bot.sendMessage(msg.chat.id, 'У вас не было сделок');
     return;
   }
-  bot.sendMessage(msg.chat.id, `Всего ${sales.length} сделок на сумму ${money} руб.`, {
+  bot.sendMessage(msg.chat.id, `Всего ${sales.length} ${declOfNum(sales.length, ['сделка', 'сделки', 'сделок'])} на сумму ${money} руб.`, {
     reply_markup: {
       inline_keyboard: 
         sales.map(el => {
