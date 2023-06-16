@@ -8,3 +8,5 @@ process.db = new DB(process.env.DB_URI);
 const commandsPath = path.join(__dirname, 'commands');
 const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 commandFiles.forEach((file) => require(path.join(commandsPath, file)));
+process.on('uncaughtException', (e) => console.log(`Uncaught exception\n${e}`));
+process.on('unhandledRejection', (e) => console.log(`Unhandled rejection\n${e}`));
