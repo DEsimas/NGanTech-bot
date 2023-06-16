@@ -1,3 +1,5 @@
+const cancelMeetup = require('../notifications/cancelMeetup');
+
 const {bot, db} = process;
 const state = new Map();
 
@@ -32,8 +34,12 @@ async function deleteMeetup(msg) {
 async function deleteByTitleFromMessage(msg) {
   const user = state.get(msg.from.id);
   user.isDeleting = false;
-  if(await db.deleteMeetup(msg.from.id, msg.text))
+  const meetup = await db.deleteMeetup(msg.from.id, msg.text);
+  if(meetup) {
     await bot.editMessageText('Встреча отменена', {chat_id: user.chatId, message_id: user.messageId});
-  else
+    await cancelMeetup(meetup);
+  }
+  else {
     await bot.editMessageText('Вы не планировали встречи с таким названием', {chat_id: user.chatId, message_id: user.messageId});
+  }
 }

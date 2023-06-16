@@ -26,8 +26,9 @@ module.exports = function(connection_string) {
   }
 
   this.deleteMeetup = async function(speakerId, meetupName) {
-    const res = await meetups.deleteMany({speakerId, title: meetupName});
-    return res.deletedCount > 0;
+    const res = await meetups.findOne({speakerId, title: meetupName});
+    await meetups.deleteMany({speakerId, title: meetupName});
+    return res;
   }
 
   this.getGodUserId = async function() {
