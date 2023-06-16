@@ -11,5 +11,16 @@ bot.on('message', async (msg) => {
 });
 
 async function top(msg) {
-  console.log(await db.getTop());
+  const top = await db.getTop();
+  bot.sendMessage(msg.chat.id, 'Топ:', {
+    reply_markup: {
+      inline_keyboard: 
+        top.map(el => {
+          return [{
+            text: `${el.user} | ${el.sum}`,
+            callback_data: 'uwu'
+          }]
+        })
+    }
+  });
 }

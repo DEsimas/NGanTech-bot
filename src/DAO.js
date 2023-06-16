@@ -59,7 +59,7 @@ module.exports = function(connection_string) {
         }
       }
     });
-    return Object.keys(res).map(key => ({user: key, ...res[key]}));
+    return Object.keys(res).map(key => ({user: key, ...res[key]})).sort((a,b) => b.sum - a.sum);
   }
 
   return this;
