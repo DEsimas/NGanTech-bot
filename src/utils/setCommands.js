@@ -16,7 +16,7 @@ const commands = [
   },
   {
     command: 'confirmsale',
-    description: 'Добавить менеджеру продажу'
+    description: 'Заявить о сделанной продаже'
   }
 ];
 

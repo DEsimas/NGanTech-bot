@@ -6,6 +6,5 @@ const DB = require('./DAO');
 process.bot = new TelegramBot(process.env.BOT_TOKEN, {polling: true});
 process.db = new DB(process.env.DB_URI);
 const commandsPath = path.join(__dirname, 'commands');
-const commandFiles = fs.readdirSync(commandsPath
-  ).filter(file => file.endsWith('.js'));
+const commandFiles = fs.readdirSync(commandsPath).filter(file => file.endsWith('.js'));
 commandFiles.forEach((file) => require(path.join(commandsPath, file)));
