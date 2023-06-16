@@ -12,5 +12,20 @@ bot.on('message', async (msg) => {
 
 async function stats(msg) {
   const sales = await db.getSales(msg.from.id);
-  console.log(sales)
+  const money = sales.reduce((pr, curr) => pr+curr.price, 0);
+  if(!sales?.length) {
+    bot.sendMessage(msg.chat.id, 'У вас не было сделок');
+    return;
+  }
+  bot.sendMessage(msg.chat.id, `Всего ${sales.length} сделок на сумму ${money} руб.`, {
+    reply_markup: {
+      inline_keyboard: 
+        sales.map(el => {
+          return [{
+            text: `${el.price} | ${el.date.toLocaleString('ru').slice(0,-3)}`,
+            callback_data: 'uwu'
+          }]
+        })
+    }
+  });
 }
