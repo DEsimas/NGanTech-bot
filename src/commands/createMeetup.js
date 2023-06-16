@@ -43,7 +43,7 @@ bot.on('callback_query', async (query) => {
   } catch(e) {
     console.log(e);
     bot.sendMessage(query.message.chat.id, 'Во время исполнения команды произошла ошибка!');
-}
+  }
 });
 
 async function createMeetup(msg) {
