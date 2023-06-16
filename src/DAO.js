@@ -5,6 +5,7 @@ module.exports = function(connection_string) {
   const db = client.db('telegrambot');
   const users = db.collection('users');
   const meetups = db.collection('meetups');
+  const sales = db.collection('sales');
   client.connect();
 
   this.getUserRoles = async function(userId) {
@@ -27,6 +28,16 @@ module.exports = function(connection_string) {
   this.deleteMeetup = async function(speakerId, meetupName) {
     const res = await meetups.deleteMany({speakerId, title: meetupName});
     return res.deletedCount > 0;
+  }
+
+  this.getGodUserId = async function() {
+    const list = await users.find().toArray();
+    const user = list.filter(u => u.roles.includes('god'))?.at(0);
+    return user.userId;
+  }
+
+  this.addSale = async function(sale) {
+    await sales.insertOne(sale);
   }
 
   return this;
