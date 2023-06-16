@@ -5,7 +5,8 @@ const DB = require('./DAO');
 process.bot = new TelegramBot(process.env.BOT_TOKEN, {polling: true});
 process.db = new DB(process.env.DB_URI);
 const {bot, db} = process;
-require('./commands/createMeetup')
+require('./commands/createMeetup');
+require('./commands/meetups');
 // bot.on('message', msg => {
 //   if(!state.has(msg.from.id)) state.set(msg.from.id, {});
 //   const user = state.get(msg.from.id);
@@ -21,24 +22,7 @@ require('./commands/createMeetup')
 /**
  * @param {TelegramBot.Message} msg 
  */
-async function meetups(msg) {
-  const meetups = await db.getMeetups();
-  if(!meetups?.length) {
-    bot.sendMessage(msg.chat.id, 'В планах пока ничего нет');
-    return;
-  }
-  bot.sendMessage(msg.chat.id, 'Расписание встреч:', {
-    reply_markup: {
-      inline_keyboard: 
-        meetups.map(el => {
-          return [{
-            text: `${el.title} | ${el.date.toLocaleString('ru').slice(0,-3)}`,
-            url: 'https://github.com/DEsimas'
-          }]
-        })
-    }
-  })
-}
+
 
 /**
  * @param {TelegramBot.Message} msg 
