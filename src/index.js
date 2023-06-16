@@ -2,10 +2,22 @@ require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 const DB = require('./DAO');
 
+const state = new Map();
 const bot = new TelegramBot(process.env.BOT_TOKEN, {polling: true});
 const db = new DB(process.env.DB_URI);
 
 bot.on('message', msg => {
+  if(!state.has(msg.from.id)) state.set(msg.from.id, {});
+  const user = state.get(msg.from.id);
+  if(user.isWaitingMeetupTitle) {
+    user.isWaitingMeetupTitle = false;
+    user.meetup.title = msg.text;
+    user.meetup.date = {};
+    try {
+      selectMonth(msg);
+    } catch {}
+  }
+
   if(msg.entities?.at(0)?.type !== 'bot_command') return;
   let handler;
   const command = msg.text.split(' ')?.at(0);
@@ -29,6 +41,48 @@ bot.on('message', msg => {
   }
 });
 
+bot.on('callback_query', (query) => {
+  const data = query.data.split(' ');
+  const type = data[0];
+  const user = state.get(query.from.id);
+  switch(type) {
+    case 'month':
+      user.meetup.date.month = Number(data[1]);
+      selectDate(query);
+      break;
+  }
+  bot.answerCallbackQuery(query.id);
+});
+
+function selectMonth(msg) {
+  const list = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь' ];
+  const index = new Date().getMonth();
+  const thisYearList = list.slice(index, 12);
+  const nextYearList = list.slice(0, index);
+  const months = thisYearList.concat(nextYearList);
+  const markup = {
+      inline_keyboard: [[],[],[],[]]
+  }
+  for(let i = 0; i < 12; i++)
+  markup.inline_keyboard[Math.floor(i/3)].push({text: months[i], callback_data: `month ${i.toString()}`});
+  const user = state.get(msg.from.id);
+  bot.editMessageText('Выберете месяц встречи:', {chat_id: user.chatId, message_id: user.messageId});
+  bot.editMessageReplyMarkup(markup, {chat_id: user.chatId, message_id: user.messageId});
+}
+
+function selectDate(query) {
+  const user = state.get(query.from.id);
+  const amountOfDays = new Date(year, user.meetup.date.month+1, 0).getDate();
+  const currentDay = new Date().getDate();
+  const markup = {
+    reply_markup: {
+      inline_keyboard: [[],[],[],[],[],[]]
+    }
+  }
+  for(let i = 0; i < amountOfDays; i++)
+    markup.reply_markup.inline_keyboard[Math.floor(i/6)].push({text: i+1, callback_data: `day ${i.toString()}`});
+}
+
 /**
  * @param {TelegramBot.Message} msg 
  */
@@ -39,29 +93,12 @@ async function createMeetup(msg) {
     return;
   }
 
-  const dateFormat = new RegExp(/..\...\..... ..:../); //30.06.2022 19:32
-  const args = msg.text.split('"');
-  const title = args[1];
-  const dateString = args[3];
-  if(title === '' || !dateFormat.exec(dateString)) {
-    bot.sendMessage(msg.chat.id, 'Команда была неверно использована!');
-    return;
-  }
-  const dateparts = dateString.split(/[. :]/);
-  const date = new Date();
-  date.setDate(dateparts[0]);
-  date.setMonth(dateparts[1]-1);
-  date.setFullYear(dateparts[2]);
-  date.setHours(dateparts[3]);
-  date.setMinutes(dateparts[4]);
-
-  db.createMeetup({
-    speakerId: msg.from.id,
-    date,
-    title
-  });
-
-  bot.sendMessage(msg.chat.id, 'Встреча запланирована.');
+  const answer = await bot.sendMessage(msg.from.id, 'Введите название встречи:');
+  const user = state.get(msg.from.id);
+  user.isWaitingMeetupTitle = true;
+  user.chatId = answer.chat.id;
+  user.messageId = answer.message_id;
+  user.meetup = {};
 }
 
 /**
