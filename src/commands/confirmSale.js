@@ -30,7 +30,8 @@ bot.on('callback_query', async (query) => {
           userId: sale.userId,
           price: sale.price,
           date: new Date()
-        })
+        });
+        bot.sendMessage(sale.userId, 'Продажа подтверждена');  
       }
       await bot.deleteMessage(user.chatId, user.messageId);
     }
