@@ -13,6 +13,10 @@ const commands = [
   {
     command: 'meetups',
     description: 'Просмотреть список предстоящих встреч'
+  },
+  {
+    command: 'confirmsale',
+    description: 'Добавить менеджеру продажу'
   }
 ];
 
