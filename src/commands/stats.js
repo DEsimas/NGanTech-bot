@@ -4,7 +4,7 @@ const {bot, db} = process;
 
 bot.on('message', async (msg) => {
   try {
-    if(msg.text.includes('/stats'))
+    if(msg?.text?.includes('/stats'))
       await stats(msg)
   } catch(e) {
     console.log(e);

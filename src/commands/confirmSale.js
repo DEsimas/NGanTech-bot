@@ -7,7 +7,7 @@ bot.on('message', async (msg) => {
   try {
     if(!state.has(msg.from.id))
       state.set(msg.from.id, {});
-    if(msg.text.includes('/confirmsale'))
+    if(msg?.text?.includes('/confirmsale'))
       await confirmSale(msg)
     else if(state.get(msg.from.id).isWaitingMoney)
       await getMoney(msg);
@@ -51,7 +51,7 @@ async function confirmSale(msg) {
 
 async function getMoney(msg) {
   const user = state.get(msg.from.id);
-  const amount = Number(msg.text);
+  const amount = Number(msg?.text);
   user.isWaitingMoney = false;
   if(isNaN(amount)) {
     await bot.sendMessage(msg.from.id, 'Неверное число, попробуйте ещё раз');

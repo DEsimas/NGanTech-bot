@@ -7,7 +7,7 @@ bot.on('message', async (msg) => {
   try {
     if(!state.has(msg.from.id))
       state.set(msg.from.id, {});
-    if(msg.text.includes('/deletemeetup'))
+    if(msg?.text?.includes('/deletemeetup'))
       await deleteMeetup(msg);
     else if(state.get(msg.from.id).isDeleting)
       await deleteByTitleFromMessage(msg);
@@ -34,7 +34,7 @@ async function deleteMeetup(msg) {
 async function deleteByTitleFromMessage(msg) {
   const user = state.get(msg.from.id);
   user.isDeleting = false;
-  const meetup = await db.deleteMeetup(msg.from.id, msg.text);
+  const meetup = await db.deleteMeetup(msg.from.id, msg?.text);
   if(meetup) {
     await bot.editMessageText('Встреча отменена', {chat_id: user.chatId, message_id: user.messageId});
     await cancelMeetup(meetup);

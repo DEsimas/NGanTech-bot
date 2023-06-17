@@ -5,9 +5,9 @@ const {bot, db} = process;
 
 bot.on('message', async (msg) => {
   try {
-    if(!state.has(msg.from.id))
-      state.set(msg.from.id, {filter: true});
-    if(msg.text.includes('/top'))
+    if(!state.has(msg.chat.id))
+      state.set(msg.chat.id, {filter: true});
+    if(msg?.text?.includes('/top'))
       await top(msg)
   } catch(e) {
     console.log(e);
@@ -19,11 +19,13 @@ bot.on('callback_query', async (query) => {
   try {
     const data = query.data.split(' ');
     const type = data[0];
-    const user = state.get(query.from.id);
+    const chat = state.get(query.message.chat.id);
     if(type !== 'top') return;
-    user.filter = Boolean(Number(data[1]));
-    const options = await getMarkup(query.from.id);
-    await bot.editMessageReplyMarkup(options.reply_markup, {chat_id: user.chatId, message_id: user.messageId});
+    chat.filter = Boolean(Number(data[1]));
+    const options = await getMarkup(query.message.chat.id);
+    try {
+      await bot.editMessageReplyMarkup(options.reply_markup, {chat_id: query.message.chat.id, message_id: query.message.message_id});
+    } catch {}
   } catch(e) {
     console.log(e);
     bot.sendMessage(query.message.chat.id, 'Во время исполнения команды произошла ошибка!');
@@ -32,24 +34,25 @@ bot.on('callback_query', async (query) => {
 
 async function top(msg) {
   const user = state.get(msg.from.id);
-  const answer = await bot.sendMessage(msg.chat.id, 'Топ:', await getMarkup(msg.from.id));
-  user.chatId = answer.chat.id;
-  user.messageId = answer.message_id;
+  const options  = await getMarkup(msg.chat.id);
+  const answer = await bot.sendMessage(msg.chat.id, 'Топ:', options);
+  state.set(answer.chat.id, {filter: true});
 }
 
-async function getMarkup(userId) {
+async function getMarkup(chatId) {
   const top = await db.getTop();
-  const filter = state.get(userId).filter;
+  const filter = state.get(chatId).filter;
   top.sort((a,b) => filter ? b.sum - a.sum : b.amount - a.amount);
   const options = {
     reply_markup: {
       inline_keyboard: 
-        top.map(el => {
+        await Promise.all(top.map(async (el) => {
+          const user = (await bot.getChat(el.user)) || '';
           return [{
-            text: `${el.sum} руб. за ${el.amount} ${declOfNum(el.amount, ['сделку', 'сделки', 'сделок'])}`,
+            text: `${`${user.first_name} ${user.last_name ? user.last_name : ''}`.trim()} | ${el.sum} руб. за ${el.amount} ${declOfNum(el.amount, ['сделку', 'сделки', 'сделок'])}`,
             url: `tg://user?id=${el.user}`
           }]
-        })
+        }))
     }
   };
   options.reply_markup.inline_keyboard.push([

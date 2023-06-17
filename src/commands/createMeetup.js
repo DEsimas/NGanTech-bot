@@ -7,7 +7,7 @@ bot.on('message', async (msg) => {
   try {
     if(!state.has(msg.from.id))
       state.set(msg.from.id, {});
-    if(msg.text.includes('/createmeetup'))
+    if(msg?.text?.includes('/createmeetup'))
       await createMeetup(msg)
     else if(state.get(msg.from.id).isWaitingMeetupTitle)
       selectTitle(msg);
@@ -66,7 +66,7 @@ async function createMeetup(msg) {
 async function selectTitle(msg) {
   const user = state.get(msg.from.id);
   user.isWaitingMeetupTitle = false;
-  user.meetup.title = msg.text;
+  user.meetup.title = msg?.text;
   await selectMonth(msg);
 }
 

@@ -2,7 +2,7 @@ const {bot, db} = process;
 
 bot.on('message', async (msg) => {
   try {
-    if(msg.text.includes('/meetups'))
+    if(msg?.text?.includes('/meetups'))
       await meetups(msg)
   } catch(e) {
     console.log(e);
